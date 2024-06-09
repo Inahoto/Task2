@@ -1,0 +1,155 @@
+{
+	"info": {
+		"_postman_id": "db813e2d-b9a6-4468-93fb-ed181b72e9b3",
+		"name": "Dog Breed",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32937010",
+		"_collection_link": "https://www.postman.com/ayeinahoto/workspace/rakuten-api-test/collection/32937010-db813e2d-b9a6-4468-93fb-ed181b72e9b3?action=share&source=collection_link&creator=32937010"
+	},
+	"item": [
+		{
+			"name": "List All Breeds",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"pm.test(\"List of Individual Breeds Created\", function() {\r",
+							"\t\r",
+							"// Create individual lists for each breed\r",
+							"\tconst individualBreeds = Object.keys(response.message);\r",
+							"\tindividualBreeds.forEach(breed => console.log(breed));\r",
+							"//console.log(individualBreeds.join(', '));\r",
+							"})\r",
+							"\r",
+							"// Validate if 'basenji'breed is present in the response\r",
+							"pm.test(\"'basenji' breed is present in the response\", function () {\r",
+							"    pm.expect(response.message).to.have.property('basenji');\r",
+							"});\r",
+							"\r",
+							"//  Response Time Validation less than 200milisecond\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status Code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dog.ceo/api/breeds/list/all",
+					"protocol": "https",
+					"host": [
+						"dog",
+						"ceo"
+					],
+					"path": [
+						"api",
+						"breeds",
+						"list",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Sub Breeds",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Load the Ajv (Another JSON Schema Validator) library\r",
+							"const Ajv = require('ajv');\r",
+							"const ajv = new Ajv();\r",
+							"\r",
+							"// Defining the expected schema from API response\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"message\": {\r",
+							"            \"type\": \"array\",\r",
+							"            \"items\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"status\": {\r",
+							"            \"type\": \"string\"\r",
+							"        }\r",
+							"    },\r",
+							"    \"required\": [\"message\", \"status\"]\r",
+							"};\r",
+							"\r",
+							"// Getting the response JSON\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"// Perform schema validation with ajv library\r",
+							"pm.test(\"Schema is valid\", function () {\r",
+							"    const validate = ajv.compile(schema);\r",
+							"    const valid = validate(responseJson);\r",
+							"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+							"});\r",
+							"\r",
+							"//Perform Data Validation for the Breed names\r",
+							"pm.test(\"Data is Valid\", function() {\r",
+							"\t\tpm.expect(responseJson.status).to.equal(\"success\");\r",
+							"\t\t// Validate the array objects contains breeds\r",
+							"\t\tconst expectedBreeds = [\"afghan\", \"basset\", \"blood\", \"english\", \"ibizan\", \"plott\",\"walker\"];\r",
+							"\t\tpm.expect(responseJson.message).to.have.members(expectedBreeds);\r",
+							"\r",
+							"})\r",
+							"\r",
+							"// Validate if 'basenji'breed is present in the response\r",
+							"pm.test(\"'english' is present in the response message\", function () {\r",
+							"    pm.expect(responseJson.message).to.include('english');\r",
+							"});\r",
+							"\r",
+							"//Validate if the response message is in Array\r",
+							"pm.test(\"Response message is an array\", function () {\r",
+							"    pm.expect(responseJson.message).to.be.an(\"array\");\r",
+							"});\r",
+							"\r",
+							"// Validating the reponse code\r",
+							"pm.test(\"Status Code is 200\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dog.ceo/api/breed/hound/list",
+					"protocol": "https",
+					"host": [
+						"dog",
+						"ceo"
+					],
+					"path": [
+						"api",
+						"breed",
+						"hound",
+						"list"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
